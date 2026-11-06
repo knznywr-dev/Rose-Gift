@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="p" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#7d0a22"/>
+      <stop offset="0.55" stop-color="#b31434"/>
+      <stop offset="1" stop-color="#e04a68"/>
+    </linearGradient>
+    <linearGradient id="s" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f522d"/>
+      <stop offset="0.5" stop-color="#6d9955"/>
+      <stop offset="1" stop-color="#33582f"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#1a0b26"/>
+  <path d="M32 56 C33 48 30 43 32 37" fill="none" stroke="url(#s)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M31 47 C25 43 20 43 17 46 C22 50 28 50 31 47 Z" fill="#4d8046"/>
+  <path d="M33 51 C38 46 44 46 47 49 C42 53 36 53 33 51 Z" fill="#4d8046"/>
+  <g transform="translate(32 25)">
+    <circle r="19" fill="#ff6f92" opacity="0.14"/>
+    <g fill="url(#p)">
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(0)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(72)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(144)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(216)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(288)"/>
+    </g>
+    <g fill="#8f0c25" transform="scale(0.62) rotate(36)">
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(0)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(120)"/>
+      <path d="M0 0 C-12 -2 -17 -13 -11 -22 C-5 -30 7 -28 11 -19 C15 -10 8 -2 0 0Z" transform="rotate(240)"/>
+    </g>
+    <circle r="4" fill="#5c0517"/>
+  </g>
+</svg>

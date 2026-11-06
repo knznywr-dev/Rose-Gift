@@ -1,0 +1,26 @@
+# Operating system + editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains / Sublime
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and temporary files
+*.log
+*.tmp
+*~
+
+# Optional: keep your real photos and songs out of a public repo.
+# Remove the # symbols below if you want to publish without them.
+# assets/images/*.jpg
+# assets/images/*.jpeg
+# assets/images/*.png
+# assets/images/*.webp
+# assets/audio/*.mp3

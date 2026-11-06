@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<!--
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │  A ROSE FOR YOU  ·  an interactive 3D rose                               │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │  PERSONALIZE  →  open js/config.js                                      │
+  │                                                                          │
+  │  No build step, no npm. Open index.html in a browser, or use VS Code's   │
+  │  Live Server extension. Three.js, GSAP and the fonts load from CDNs,     │
+  │  so the first visit needs an internet connection.                        │
+  └──────────────────────────────────────────────────────────────────────────┘
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#170a24" />
+  <meta name="color-scheme" content="dark" />
+  <title>A Rose for You</title>
+  <meta name="description" content="A little interactive rose, blooming just for you." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+
+  <!-- Fonts: Great Vibes (script) + Cormorant Garamond (serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<!-- Ambient bokeh backdrop -->
+<div id="bg" aria-hidden="true">
+  <div class="bokeh b1"></div>
+  <div class="bokeh b2"></div>
+  <div class="bokeh b3"></div>
+  <div class="bokeh b4"></div>
+  <div class="bokeh b5"></div>
+  <div class="bokeh b6"></div>
+  <div class="bokeh b7"></div>
+  <div class="bokeh b8"></div>
+</div>
+
+<!-- WebGL canvas -->
+<canvas id="scene" aria-label="A three-dimensional rose that you can drag to look around"></canvas>
+
+<!-- Vignette + bottom scrim + film grain -->
+<div id="atmosphere" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+
+<!-- Painted rose, only shown if WebGL cannot start -->
+<div id="fallbackRose" aria-hidden="true">
+  <svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="fbOuter" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#3a0210" />
+        <stop offset="0.55" stop-color="#7d0a22" />
+        <stop offset="1" stop-color="#b31434" />
+      </linearGradient>
+      <linearGradient id="fbMid" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#4b0412" />
+        <stop offset="0.55" stop-color="#8f0c25" />
+        <stop offset="1" stop-color="#cf3453" />
+      </linearGradient>
+      <linearGradient id="fbInner" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#36020d" />
+        <stop offset="0.6" stop-color="#6d0619" />
+        <stop offset="1" stop-color="#a51633" />
+      </linearGradient>
+      <linearGradient id="fbStem" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#2f522d" />
+        <stop offset="0.5" stop-color="#6d9955" />
+        <stop offset="1" stop-color="#33582f" />
+      </linearGradient>
+      <linearGradient id="fbLeaf" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7da45e" />
+        <stop offset="1" stop-color="#2c4d2c" />
+      </linearGradient>
+      <radialGradient id="fbLight" cx="0.35" cy="0.3" r="0.7">
+        <stop offset="0" stop-color="#ffd6de" stop-opacity="0.5" />
+        <stop offset="0.45" stop-color="#ff8fa8" stop-opacity="0.18" />
+        <stop offset="1" stop-color="#ff6f92" stop-opacity="0" />
+      </radialGradient>
+      <filter id="fbSoft" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="7" />
+      </filter>
+      <path id="fbPetal" d="M0 0 C -54 -12 -78 -64 -48 -108 C -20 -148 40 -138 55 -94 C 68 -54 38 -12 0 0 Z" />
+    </defs>
+
+    <!-- stem + leaves -->
+    <path d="M200 596 C208 522 188 474 197 424 C204 384 195 352 200 320" fill="none" stroke="url(#fbStem)" stroke-width="13" stroke-linecap="round" />
+    <path d="M199 476 C160 438 116 438 92 462 C124 484 166 494 199 476 Z" fill="url(#fbLeaf)" />
+    <path d="M199 476 C168 468 128 470 104 482" fill="none" stroke="#94b96d" stroke-opacity="0.45" stroke-width="2" />
+    <path d="M202 508 C240 466 286 464 310 486 C282 512 238 522 202 508 Z" fill="url(#fbLeaf)" />
+    <path d="M202 508 C234 500 274 500 300 504" fill="none" stroke="#94b96d" stroke-opacity="0.4" stroke-width="2" />
+    <path d="M198 548 C168 524 140 522 120 536 C142 556 174 560 198 548 Z" fill="url(#fbLeaf)" opacity="0.8" />
+    <path d="M200 404 C188 386 170 378 158 380 C166 396 184 406 200 404 Z" fill="#3d6a36" />
+    <path d="M201 404 C216 384 236 378 248 381 C239 398 220 407 201 404 Z" fill="#3d6a36" />
+
+    <!-- bloom -->
+    <g transform="translate(200 196)">
+      <circle r="132" fill="url(#fbLight)" opacity="0.9" />
+      <g fill="url(#fbOuter)" stroke="#4b0412" stroke-opacity="0.35" stroke-width="1.2">
+        <use href="#fbPetal" transform="rotate(0) scale(1.02)" />
+        <use href="#fbPetal" transform="rotate(36) scale(0.98)" />
+        <use href="#fbPetal" transform="rotate(72) scale(1.03)" />
+        <use href="#fbPetal" transform="rotate(108) scale(0.97)" />
+        <use href="#fbPetal" transform="rotate(144) scale(1.01)" />
+        <use href="#fbPetal" transform="rotate(180) scale(0.99)" />
+        <use href="#fbPetal" transform="rotate(216) scale(1.02)" />
+        <use href="#fbPetal" transform="rotate(252) scale(0.97)" />
+        <use href="#fbPetal" transform="rotate(288) scale(1.03)" />
+        <use href="#fbPetal" transform="rotate(324) scale(0.98)" />
+      </g>
+      <g fill="url(#fbMid)" stroke="#5c0517" stroke-opacity="0.3" stroke-width="1">
+        <use href="#fbPetal" transform="rotate(18) scale(0.8)" />
+        <use href="#fbPetal" transform="rotate(69) scale(0.76)" />
+        <use href="#fbPetal" transform="rotate(121) scale(0.82)" />
+        <use href="#fbPetal" transform="rotate(172) scale(0.77)" />
+        <use href="#fbPetal" transform="rotate(223) scale(0.81)" />
+        <use href="#fbPetal" transform="rotate(274) scale(0.76)" />
+        <use href="#fbPetal" transform="rotate(325) scale(0.8)" />
+      </g>
+      <g fill="url(#fbInner)" stroke="#42030f" stroke-opacity="0.35" stroke-width="1">
+        <use href="#fbPetal" transform="rotate(42) scale(0.56)" />
+        <use href="#fbPetal" transform="rotate(114) scale(0.54)" />
+        <use href="#fbPetal" transform="rotate(186) scale(0.58)" />
+        <use href="#fbPetal" transform="rotate(258) scale(0.53)" />
+        <use href="#fbPetal" transform="rotate(330) scale(0.57)" />
+      </g>
+      <g fill="#8a0d26" stroke="#4b0412" stroke-opacity="0.4" stroke-width="1">
+        <use href="#fbPetal" transform="rotate(8) scale(0.34)" />
+        <use href="#fbPetal" transform="rotate(96) scale(0.32)" />
+        <use href="#fbPetal" transform="rotate(184) scale(0.35)" />
+        <use href="#fbPetal" transform="rotate(272) scale(0.33)" />
+      </g>
+      <!-- inner swirl -->
+      <path d="M-30 4 C-34 -28 -6 -48 22 -36 C48 -24 44 8 18 18 C-2 26 -18 16 -14 2" fill="none" stroke="#4b0412" stroke-width="5" stroke-linecap="round" opacity="0.6" />
+      <ellipse cx="-38" cy="-44" rx="52" ry="34" fill="url(#fbLight)" filter="url(#fbSoft)" opacity="0.5" />
+    </g>
+  </svg>
+</div>
+
+<!-- Helpful notice shown only in the static fallback -->
+<p id="fallbackNote" class="fallback-note" role="status" hidden></p>
+
+<!-- Text + controls -->
+<main id="ui">
+  <div class="topbar">
+    <p class="hint" id="hint">drag to explore&nbsp;&nbsp;·&nbsp;&nbsp;tap the rose</p>
+  </div>
+
+  <section class="message">
+    <p class="eyebrow" id="eyebrow">A ROSE FOR YOU</p>
+    <h1 class="title" id="title">Happy Birthday ❤️</h1>
+    <div class="rule" aria-hidden="true"><span>✦</span></div>
+    <p class="subtitle" id="subtitle">Every petal holds a little wish for you.</p>
+
+    <div class="actions">
+      <div class="actions-main">
+        <button class="btn btn-love" id="loveBtn" type="button">
+          <svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20.7l-1.1-1C5.2 14.6 2 11.7 2 8.1 2 5.2 4.2 3 7.1 3c1.7 0 3.3.8 4.4 2.1C12.6 3.8 14.2 3 15.9 3 18.8 3 21 5.2 21 8.1c0 3.6-3.2 6.5-8.9 11.6l-.1.1z"/>
+          </svg>
+          <span>send love</span>
+        </button>
+
+        <button class="btn" id="letterBtn" type="button">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="6" width="18" height="12" rx="2" />
+            <path d="M3.5 7l8.5 6 8.5-6" />
+          </svg>
+          <span>read my letter</span>
+        </button>
+
+        <button class="btn" id="surpriseBtn" type="button">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9z" />
+            <path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9z" />
+          </svg>
+          <span>a little surprise</span>
+        </button>
+      </div>
+
+      <div class="actions-sub">
+        <button class="btn btn-quiet" id="musicBtn" type="button" aria-pressed="false" title="Soft ambient music, off by default">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span id="musicLabel">music off</span>
+        </button>
+
+        <button class="btn btn-quiet" id="galleryBtn" type="button" hidden>
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <circle cx="8.5" cy="10" r="1.5" />
+            <path d="M21 16l-5-5-6 6" />
+          </svg>
+          <span>our photos</span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ══ Letter ══ -->
+<div class="modal" id="letterModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+    <button class="modal-close" type="button" data-close data-autofocus aria-label="Close the letter">×</button>
+    <p class="modal-kicker">a note from the heart</p>
+    <h2 class="modal-title" id="letterTitle">A letter for you</h2>
+    <div class="modal-rule" aria-hidden="true"></div>
+    <div class="letter-body" id="letterBody"></div>
+    <p class="letter-sign" id="letterSign"></p>
+  </div>
+</div>
+
+<!-- ══ Surprise ══ -->
+<div class="modal" id="surpriseModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card surprise-card" id="surpriseCard" role="dialog" aria-modal="true" aria-labelledby="surpriseTitle">
+    <div id="surpriseHearts" aria-hidden="true"></div>
+    <button class="modal-close" type="button" data-close data-autofocus aria-label="Close the surprise">×</button>
+    <p class="modal-kicker">just between us</p>
+    <h2 class="modal-title" id="surpriseTitle">A little surprise</h2>
+    <p class="surprise-message" id="surpriseMessage"></p>
+    <div class="surprise-actions">
+      <button class="btn btn-love" id="surpriseReplay" type="button">
+        <svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 20.7l-1.1-1C5.2 14.6 2 11.7 2 8.1 2 5.2 4.2 3 7.1 3c1.7 0 3.3.8 4.4 2.1C12.6 3.8 14.2 3 15.9 3 18.8 3 21 5.2 21 8.1c0 3.6-3.2 6.5-8.9 11.6l-.1.1z"/>
+        </svg>
+        <span>again</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Gallery ══ -->
+<div class="modal" id="galleryModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card gallery-card" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <button class="modal-close" type="button" data-close data-autofocus aria-label="Close the photo gallery">×</button>
+    <p class="modal-kicker">our little moments</p>
+    <h2 class="modal-title" id="galleryTitle">Our photos</h2>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- ══ Lightbox ══ -->
+<div class="modal lightbox-modal" id="lightbox" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="lightbox-card" role="dialog" aria-modal="true" aria-label="Enlarged photo">
+    <button class="modal-close lightbox-close" type="button" data-close data-autofocus aria-label="Close the enlarged photo">×</button>
+    <img id="lightboxImg" alt="" />
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+</div>
+
+<!-- Loading screen -->
+<div id="loader" role="status" aria-live="polite">
+  <div class="loader-inner">
+    <div class="loader-orbit" aria-hidden="true"><span></span></div>
+    <p class="loader-text">Gathering petals</p>
+    <p class="loader-note"></p>
+    <button class="loader-retry" id="loaderRetry" type="button" hidden>try again</button>
+  </div>
+</div>
+
+<noscript>
+  <div class="noscript-msg">
+    This little rose needs JavaScript and WebGL to bloom.<br />
+    Please enable JavaScript and open the page again. 🌹
+  </div>
+</noscript>
+
+<!-- Three.js import map -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- Application -->
+<script type="module" src="js/main.js"></script>
+
+<!-- Last-resort watchdog: if the module itself cannot load, never trap the page. -->
+<script>
+  (function () {
+    var retry = document.getElementById("loaderRetry");
+    if (retry) retry.addEventListener("click", function () { window.location.reload(); });
+    window.setTimeout(function () {
+      if (window.__roseReady) return;
+      var loader = document.getElementById("loader");
+      var note = loader && loader.querySelector(".loader-note");
+      if (note) {
+        note.textContent = "Still gathering petals… Check your internet connection, then try again. The 3D engine, animation library and fonts all load from CDNs.";
+      }
+      if (loader) loader.classList.add("is-error");
+      if (retry) retry.hidden = false;
+    }, 20000);
+  })();
+</script>
+</body>
+</html>
