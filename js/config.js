@@ -54,13 +54,12 @@ export const CONFIG = {
 
   surpriseMessage:
     "You are my favourite person, my safest place, and the best part of " +
-    "every ordinary day. I love you — today, tomorrow, and all the " +
-    "birthdays after this one.",
+    "every ordinary day. I love you — today, tomorrow, and forever ",
 
   /* ── Optional photo gallery ─────────────────────────────────────────── */
   /* Add file names from assets/images/ here. Both forms work:
        photos: ["assets/images/us-1.jpg", "assets/images/us-2.jpg"]
        photos: [{ src: "assets/images/us-1.jpg", alt: "Our first trip" }]
      Leave the array empty to hide the gallery completely. */
-  photos: ["assets/images/us-1.png", "assets/images/us-2.png", "assets/images/us-3.png"],
+  photos: ["assets/images/us-1.jpg", "assets/images/us-2.jpg", "assets/images/us-3.jpg"],
 };
