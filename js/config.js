@@ -45,10 +45,11 @@ export const CONFIG = {
     "Thank you for being my calm and my favourite kind of chaos. I hope " +
     "this year brings you everything you quietly wish for, and a few " +
     "beautiful surprises you didn't even know to ask for.\n\n" +
-    "Happy birthday, my love. This rose will keep blooming for you.",
+    "Happy birthday, my love. This rose will keep blooming for you.\n\n"+
+    "Always yours\n",
 
-  letterSignature: "Always yours\n",+
-                   "Kenz",
+  letterSignature: "Kenz",
+                   
 
   /* ── The hidden surprise ────────────────────────────────────────────── */
   surpriseTitle: "A little surprise",
