@@ -62,5 +62,5 @@ export const CONFIG = {
        photos: ["assets/images/us-1.jpg", "assets/images/us-2.jpg"]
        photos: [{ src: "assets/images/us-1.jpg", alt: "Our first trip" }]
      Leave the array empty to hide the gallery completely. */
-  photos: [],
+  photos: ["assets/images/us-1.png", "assets/images/us-2.png", "assets/images/us-3.png"],
 };
