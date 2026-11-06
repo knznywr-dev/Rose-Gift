@@ -47,7 +47,7 @@ export const CONFIG = {
     "beautiful surprises you didn't even know to ask for.\n\n" +
     "Happy birthday, my love. This rose will keep blooming for you.",
 
-  letterSignature: "Always yours",
+  letterSignature: "Always yours \n Kenz",
 
   /* ── The hidden surprise ────────────────────────────────────────────── */
   surpriseTitle: "A little surprise",
